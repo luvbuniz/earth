@@ -83,11 +83,26 @@
   }
 
   /* ── Renderer / scene bootstrap ──────────────────────────────── */
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  } catch (e) {
-    fatal('WebGL is not available in this browser.');
+  // Try progressively safer context options — some browsers (e.g. Brave with
+  // strict Shields, or machines with GPU acceleration off) reject the first.
+  let renderer = null;
+  for (const opts of [
+    { antialias: true, powerPreference: 'high-performance' },
+    { antialias: false },
+    { antialias: false, failIfMajorPerformanceCaveat: false },
+  ]) {
+    try { renderer = new THREE.WebGLRenderer(opts); break; } catch (e) { /* try next */ }
+  }
+  if (!renderer) {
+    const isBrave = !!navigator.brave;
+    fatal(
+      'This browser has WebGL (3D graphics) switched off.<br><br>' +
+      (isBrave
+        ? 'In <b>Brave</b>: click the 🦁 <b>Shields</b> icon in the address bar and set ' +
+          '<b>Block fingerprinting</b> to Standard (or off) for this site, and make sure ' +
+          '<b>Use hardware acceleration</b> is on in <code>brave://settings/system</code>. Then reload.'
+        : 'Enable hardware acceleration / WebGL in your browser settings and reload.')
+    );
     return;
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -614,7 +629,7 @@
   canvas.addEventListener('pointerdown', () => { tween = null; controls.enabled = true; });
 
   /* ── Street-map mode (Leaflet) ───────────────────────────────── */
-  let map = null, tileDay = null, tileNight = null, activeTile = null, diveMarker = null;
+  let map = null, tileDay = null, tileNight = null, tileSat = null, activeTile = null, diveMarker = null;
   let exitZoom = 4, diveTime = 0;
 
   function metersPerPixelAt(dist) {
@@ -632,6 +647,10 @@
       center: [0, 0], zoom: 3, zoomSnap: 0.25, zoomDelta: 0.5,
       worldCopyJump: true, zoomControl: true, attributionControl: true,
     });
+    tileSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Imagery © Esri, Maxar, Earthstar Geographics & the GIS User Community',
+    });
     tileDay = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19, attribution: '© OpenStreetMap contributors',
     });
@@ -639,14 +658,19 @@
       maxZoom: 19, subdomains: 'abcd',
       attribution: '© OpenStreetMap contributors © CARTO',
     });
+    L.control.layers(
+      { '🛰️ Satellite': tileSat, '🗺️ Streets': tileDay, '🌙 Dark': tileNight },
+      null, { position: 'topright' }
+    ).addTo(map);
+    map.on('baselayerchange', (e) => { activeTile = e.layer; });
     map.on('zoomend', () => {
       // grace period so setView/minZoom churn during the dive can't bounce us out
       if (state.mapMode && performance.now() - diveTime > 700 && map.getZoom() <= exitZoom) exitMap();
     });
   }
   function pickTileLayer() {
-    const wantNight = state.lightMode === 'night';
-    const want = wantNight ? tileNight : tileDay;
+    // satellite imagery by day, dark streets in night mode (switchable in-map)
+    const want = state.lightMode === 'night' ? tileNight : tileSat;
     if (activeTile === want) return;
     if (activeTile) map.removeLayer(activeTile);
     activeTile = want.addTo(map);

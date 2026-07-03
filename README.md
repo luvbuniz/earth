@@ -18,9 +18,11 @@ country or city for live stats, and toggle clouds, flight traffic, and day/night
   shows capital, area, population, GDP, and GDP per capita (≈ 2024 estimates)
 - 🏙️ **185 major cities** with population labels that declutter automatically
 - 🔍 **Seamless zoom to street level** — double-click (or just keep zooming) and
-  the globe hands off to an OpenStreetMap street map at the matching scale;
-  night mode switches the streets to a dark basemap. Zoom back out or press
-  <kbd>Esc</kbd> to return to orbit
+  the globe hands off to a real map at the matching scale. Zoom back out or
+  press <kbd>Esc</kbd> to return to orbit
+- 🛰️ **Satellite view** — the dive lands on Esri World Imagery by default
+  (night mode lands on a dark street basemap); an in-map switcher toggles
+  Satellite / Streets / Dark
 - ⚡ **Loads fast** — ~5 MB total, no CDN dependencies, no build step, no API keys;
   everything except street-map tiles is served from this repo
 
@@ -46,6 +48,11 @@ python -m http.server 8000     # or: npm start
 > Opening `index.html` directly from the file system won't work — browsers
 > block WebGL textures and `fetch()` on `file://` pages. Serve it (above) or
 > use the Pages site.
+
+> **"WebGL is not available"?** Some setups switch 3D graphics off — most
+> commonly **Brave** with *Block fingerprinting* set to strict (click the 🦁
+> Shields icon and relax it for this site) or a browser with hardware
+> acceleration disabled. Chrome/Edge/Firefox/Safari defaults all work.
 
 ## Controls
 
@@ -93,6 +100,8 @@ vendor/               three.js r147, OrbitControls, Leaflet 1.9.4 (vendored)
 - Boundaries: [Natural Earth](https://www.naturalearthdata.com/) (public domain)
 - Street tiles: © [OpenStreetMap](https://www.openstreetmap.org/copyright)
   contributors; dark basemap © [CARTO](https://carto.com/attributions)
+- Satellite imagery: © Esri, Maxar, Earthstar Geographics & the GIS User
+  Community ([Esri World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9))
 - Country metadata: [mledoze/countries](https://github.com/mledoze/countries) (ODbL)
 - Population / GDP: hand-rounded ≈2024 UN / IMF estimates — for visualization,
   not analysis
