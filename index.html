@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Earth — Digital Twin</title>
+  <meta name="description" content="Interactive 3D digital twin of Earth — zoom from orbit to street level, hover countries for live stats, toggle clouds, flights, and day/night.">
+  <meta name="theme-color" content="#04070f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 3D globe canvas is injected here -->
+  <div id="globe"></div>
+
+  <!-- Street-level map (Leaflet), revealed when you dive in -->
+  <div id="map-wrap" aria-hidden="true">
+    <div id="map"></div>
+    <button id="btn-orbit" title="Return to the globe">🛰 Back to orbit</button>
+  </div>
+
+  <!-- Control panel -->
+  <aside id="panel">
+    <h1>EARTH <span>· digital twin</span></h1>
+
+    <div class="row seg" id="seg-light" role="group" aria-label="Lighting mode">
+      <button data-mode="day"   title="Force daylight everywhere">☀️ Day</button>
+      <button data-mode="night" title="Force night — city lights">🌙 Night</button>
+      <button data-mode="auto" class="active" title="Real sun position (live terminator)">🌗 Auto</button>
+    </div>
+
+    <label class="row toggle"><input type="checkbox" id="tgl-clouds" checked><span class="sw"></span>☁️ Cloud cover</label>
+    <label class="row toggle"><input type="checkbox" id="tgl-flights" checked><span class="sw"></span>✈️ Flight traffic</label>
+    <label class="row toggle"><input type="checkbox" id="tgl-borders" checked><span class="sw"></span>🗺️ Country borders</label>
+    <label class="row toggle"><input type="checkbox" id="tgl-spin" checked><span class="sw"></span>🔄 Auto-rotate</label>
+
+    <p class="hint">
+      Hover a country or city for stats.<br>
+      Scroll to zoom · drag to rotate.<br>
+      <b>Double-click</b> or keep zooming in<br>
+      to dive down to the streets.
+    </p>
+  </aside>
+
+  <!-- Hover popup -->
+  <div id="popup" class="hidden" role="tooltip"></div>
+
+  <!-- City labels overlay -->
+  <div id="labels" aria-hidden="true"></div>
+
+  <!-- Credits -->
+  <footer id="credits">
+    Imagery: NASA Blue Marble / Black Marble · Boundaries: Natural Earth ·
+    Streets: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> ·
+    Stats ≈ 2024 estimates
+  </footer>
+
+  <!-- Loading screen -->
+  <div id="loading">
+    <div class="load-box">
+      <div class="load-title">EARTH</div>
+      <div class="load-sub">digital twin — initializing</div>
+      <div class="load-bar"><div id="load-fill"></div></div>
+      <div id="load-msg">loading textures…</div>
+    </div>
+  </div>
+
+  <noscript><div class="nojs">This experience needs JavaScript.</div></noscript>
+
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

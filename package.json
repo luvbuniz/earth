@@ -1,0 +1,16 @@
+{
+  "name": "earth-digital-twin",
+  "version": "1.0.0",
+  "description": "Interactive 3D digital twin of Earth — zoom from orbit to street level",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8000 || python -m http.server 8000",
+    "build:data": "node tools/build-data.mjs"
+  },
+  "devDependencies": {
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
+    "world-countries": "^5.0.0"
+  }
+}
