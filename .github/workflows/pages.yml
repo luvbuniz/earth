@@ -1,5 +1,9 @@
 name: Deploy to GitHub Pages
 
+# Publishes the site by mirroring this branch to `gh-pages`, which GitHub
+# Pages serves directly. This works with the default workflow token —
+# no admin permissions or manual Pages setup required.
+
 on:
   push:
     branches:
@@ -8,27 +12,22 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish this commit to the gh-pages branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          touch .nojekyll
+          git add .nojekyll
+          git commit -m "Deploy ${GITHUB_SHA::9} to GitHub Pages"
+          git push --force origin HEAD:gh-pages

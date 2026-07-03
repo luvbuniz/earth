@@ -30,8 +30,9 @@ country or city for live stats, and toggle clouds, flight traffic, and day/night
 
 ## Run it
 
-**Option 1 — GitHub Pages (easiest):** enable *Settings → Pages → Source:
-GitHub Actions* once, and the included workflow deploys the site on every push.
+**Option 1 — the live site:** **<https://luvbuniz.github.io/earth/>** —
+republished automatically on every push (the workflow mirrors the default
+branch to `gh-pages`).
 
 **Option 2 — locally:** any static file server works (ES-module-free, no build):
 
