@@ -207,37 +207,15 @@
         // sun glint on water
         float spec = pow(max(dot(reflect(-sunDir, n), viewDir), 0.0), 42.0);
         col += vec3(0.9, 0.88, 0.75) * spec * water * dayness * 0.6;
-        // atmospheric rim
-        float fres = pow(1.0 - max(dot(n, viewDir), 0.0), 2.6);
-        col += vec3(0.22, 0.48, 1.0) * fres * (0.22 + 0.55 * dayness);
+        // faint atmospheric haze right at the limb (no detached glow ring)
+        float fres = pow(1.0 - max(dot(n, viewDir), 0.0), 4.0);
+        col += vec3(0.22, 0.48, 1.0) * fres * (0.08 + 0.25 * dayness);
 
         gl_FragColor = vec4(col, 1.0);
       }`,
   });
   const earth = new THREE.Mesh(new THREE.SphereGeometry(R, 128, 96), earthMat);
   scene.add(earth);
-
-  /* ── Atmosphere glow ─────────────────────────────────────────── */
-  const atmo = new THREE.Mesh(
-    new THREE.SphereGeometry(R * 1.16, 64, 48),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide, transparent: true, depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexShader: `
-        varying vec3 vN;
-        void main() {
-          vN = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }`,
-      fragmentShader: `
-        varying vec3 vN;
-        void main() {
-          float i = pow(0.72 - dot(vN, vec3(0.0, 0.0, -1.0)), 3.5);
-          gl_FragColor = vec4(0.24, 0.5, 1.0, 1.0) * i;
-        }`,
-    })
-  );
-  scene.add(atmo);
 
   /* ── Clouds ──────────────────────────────────────────────────── */
   const cloudMat = new THREE.MeshLambertMaterial({
